@@ -30,9 +30,11 @@ http://127.0.0.1:3000
 Register this redirect URL in the WHOOP Developer Dashboard:
 
 ```text
-http://127.0.0.1:3000/callback
+https://127.0.0.1:3000/callback
 ```
 
 If your WHOOP app was registered with a different redirect URL, update `WHOOP_REDIRECT_URI` in `.env` to match it exactly.
+
+Because WHOOP expects an HTTPS redirect, this project uses a local self-signed certificate for development. If the browser shows a certificate warning on first open, continue to the local site.
 
 Secrets live only in `.env`. Tokens are written to `data/tokens.json`, which is gitignored.

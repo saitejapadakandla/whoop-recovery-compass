@@ -1,4 +1,5 @@
 import { createServer } from "node:http";
+import { createServer as createHttpsServer } from "node:https";
 import { readFile, writeFile, mkdir, unlink, stat } from "node:fs/promises";
 import { readFileSync } from "node:fs";
 import { createReadStream } from "node:fs";
@@ -11,6 +12,8 @@ const publicRoot = join(root, "public");
 const dataRoot = join(root, "data");
 const tokenPath = join(dataRoot, "tokens.json");
 const statePath = join(dataRoot, "oauth-state.json");
+const certPath = join(dataRoot, "localhost-cert.pem");
+const keyPath = join(dataRoot, "localhost-key.pem");
 
 loadEnv(join(root, ".env"));
 
@@ -45,7 +48,7 @@ function getConfig() {
   return {
     clientId: process.env.WHOOP_CLIENT_ID || "",
     clientSecret: process.env.WHOOP_CLIENT_SECRET || "",
-    redirectUri: process.env.WHOOP_REDIRECT_URI || `http://${HOST}:${PORT}/callback`,
+    redirectUri: process.env.WHOOP_REDIRECT_URI || `https://${HOST}:${PORT}/callback`,
     scopes: process.env.WHOOP_SCOPES || DEFAULT_SCOPES,
   };
 }
@@ -88,7 +91,8 @@ function redirect(res, location) {
 }
 
 function parseUrl(req) {
-  return new URL(req.url || "/", `http://${HOST}:${PORT}`);
+  const protocol = getConfig().redirectUri.startsWith("https://") ? "https" : "http";
+  return new URL(req.url || "/", `${protocol}://${HOST}:${PORT}`);
 }
 
 function assertConfigured() {
@@ -403,7 +407,11 @@ async function route(req, res) {
 }
 
 await ensureDataDir();
-const server = createServer(route);
+const config = getConfig();
+const useHttps = config.redirectUri.startsWith("https://");
+const server = useHttps
+  ? createHttpsServer({ key: readFileSync(keyPath), cert: readFileSync(certPath) }, route)
+  : createServer(route);
 server.listen(PORT, HOST, () => {
-  console.log(`Recovery Compass running at http://${HOST}:${PORT}`);
+  console.log(`Recovery Compass running at ${useHttps ? "https" : "http"}://${HOST}:${PORT}`);
 });

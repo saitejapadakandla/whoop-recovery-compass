@@ -1,4 +1,5 @@
 .env
 data/*.json
+data/*.pem
 *.log
 .DS_Store
