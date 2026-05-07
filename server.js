@@ -403,6 +403,7 @@ async function route(req, res) {
 }
 
 await ensureDataDir();
-createServer(route).listen(PORT, HOST, () => {
+const server = createServer(route);
+server.listen(PORT, HOST, () => {
   console.log(`Recovery Compass running at http://${HOST}:${PORT}`);
 });
