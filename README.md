@@ -38,3 +38,7 @@ If your WHOOP app was registered with a different redirect URL, update `WHOOP_RE
 Because WHOOP expects an HTTPS redirect, this project uses a local self-signed certificate for development. If the browser shows a certificate warning on first open, continue to the local site.
 
 Secrets live only in `.env`. Tokens are written to `data/tokens.json`, which is gitignored.
+
+## Private Hosting
+
+Use `APP_PASSWORD` to protect the hosted app. See `DEPLOY.md` for the exact environment variables.
